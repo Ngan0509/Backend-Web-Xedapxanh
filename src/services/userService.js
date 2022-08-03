@@ -117,11 +117,11 @@ const handleGetAllUser = (userId) => {
         try {
             let users = ""
             if (userId === "All") {
-                const [rows, fields] = await pool.execute('SELECT name, email, phoneNumber FROM admin')
+                const [rows, fields] = await pool.execute('SELECT id, name, email, phoneNumber, roleId, genderId FROM admin')
                 users = rows
             }
             if (userId && userId !== "All") {
-                const [rows, fields] = await pool.execute('SELECT name, email, phoneNumber FROM admin WHERE id = ?', [userId])
+                const [rows, fields] = await pool.execute('SELECT id, name, email, phoneNumber, roleId, genderId FROM admin WHERE id = ?', [userId])
                 users = rows[0]
             }
             resolve({
