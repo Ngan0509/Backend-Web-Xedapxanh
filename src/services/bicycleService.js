@@ -7,11 +7,11 @@ const handleGetAllBicycle = (bicycleId) => {
         try {
             let bicycles = ""
             if (bicycleId === "All") {
-                const [rows, fields] = await pool.execute('SELECT id, name, price_new, price_old, discout FROM bicycle')
+                const [rows, fields] = await pool.execute('SELECT id, category_id, name, image, price_space_id, brand_id, use_target_id, weel_size_id, frame_material_id, rider_height_id, brake_id, price_new, price_old, discout FROM bicycle')
                 bicycles = rows
             }
             if (bicycleId && bicycleId !== "All") {
-                const [rows, fields] = await pool.execute('SELECT id, name, price_new, price_old, discout FROM bicycle WHERE category_id = ?', [bicycleId])
+                const [rows, fields] = await pool.execute('SELECT id, category_id, name, image, price_space_id, brand_id, use_target_id, weel_size_id, frame_material_id, rider_height_id, brake_id, price_new, price_old, discout FROM bicycle WHERE category_id = ?', [bicycleId])
                 bicycles = rows
             }
             resolve({

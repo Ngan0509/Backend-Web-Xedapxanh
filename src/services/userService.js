@@ -216,8 +216,8 @@ const handleUpdateNewUser = (data) => {
                     errMessage: "User is not found"
                 })
             }
-            await pool.execute('UPDATE admin SET name= ?, phoneNumber= ?, genderId=? where id = ?',
-                [data.fullname, data.phoneNumber, data.gender, data.id]
+            await pool.execute('UPDATE admin SET name= ?, phoneNumber= ?, genderId=?, roleId=? where id = ?',
+                [data.fullname, data.phoneNumber, data.gender, data.role, data.id]
             );
             resolve({
                 errCode: 0,

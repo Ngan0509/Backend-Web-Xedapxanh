@@ -2,6 +2,7 @@ import express from "express";
 import * as APIcontroler from '../controllers/APIcontroller'
 import * as userController from '../controllers/userController'
 import * as bicycleController from '../controllers/bicycleController'
+import * as accessoryController from '../controllers/accessoryController'
 
 let router = express.Router();
 
@@ -20,6 +21,11 @@ const initAPIRoute = (app) => {
     router.post("/api/create-new-bicycle", bicycleController.handleCreateNewBicycle)
     router.put("/api/update-bicycle", bicycleController.handleUpdateNewBicycle)
     router.delete("/api/delete-bicycle", bicycleController.handleDeleteNewBicycle)
+
+    router.get("/api/get-all-accessory", accessoryController.handleGetAllAccessory)
+    router.post("/api/create-new-accessory", accessoryController.handleCreateNewAccessory)
+    router.put("/api/update-accessory", accessoryController.handleUpdateNewAccessory)
+    router.delete("/api/delete-accessory", accessoryController.handleDeleteNewAccessory)
     return app.use('/', router)
 }
 
