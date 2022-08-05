@@ -3,6 +3,7 @@ import * as APIcontroler from '../controllers/APIcontroller'
 import * as userController from '../controllers/userController'
 import * as bicycleController from '../controllers/bicycleController'
 import * as accessoryController from '../controllers/accessoryController'
+import * as filterController from '../controllers/filterController'
 
 let router = express.Router();
 
@@ -11,6 +12,7 @@ const initAPIRoute = (app) => {
     router.post("/api/login", userController.handleLogin)
     router.get("/api/get-all-code", userController.handleGetAllCode)
     router.get("/api/get-category", userController.handleGetCategory)
+    router.get("/api/get-type-allcode", userController.handleGetTypeAllCode)
 
     router.get("/api/get-all-user", userController.handleGetAllUser)
     router.post("/api/create-new-user", userController.handleCreateNewUser)
@@ -26,6 +28,12 @@ const initAPIRoute = (app) => {
     router.post("/api/create-new-accessory", accessoryController.handleCreateNewAccessory)
     router.put("/api/update-accessory", accessoryController.handleUpdateNewAccessory)
     router.delete("/api/delete-accessory", accessoryController.handleDeleteNewAccessory)
+
+    router.get("/api/get-all-filter", filterController.handleGetAllFilter)
+    router.post("/api/create-new-filter", filterController.handleCreateNewFilter)
+    router.put("/api/update-filter", filterController.handleUpdateNewFilter)
+    router.delete("/api/delete-filter", filterController.handleDeleteNewFilter)
+
     return app.use('/', router)
 }
 

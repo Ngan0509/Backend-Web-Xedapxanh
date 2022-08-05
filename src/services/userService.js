@@ -96,11 +96,40 @@ const getAllCode = (typeInput) => {
     })
 }
 
-const handleGetCategory = () => {
+const handleGetTypeAllCode = () => {
     return new Promise(async (resolve, reject) => {
         try {
-            const [rows, fields] = await pool.execute('SELECT * FROM categogy')
+
+            let [rows, fields] = await pool.execute('SELECT DISTINCT type FROM allcode')
             let data = rows
+
+            resolve({
+                errCode: 0,
+                errMessage: `Get type all code succeed!`,
+                data: data
+            })
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
+
+
+const handleGetCategory = (inputType) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let data
+            if (inputType === 'BICYCLE') {
+                const [rows, fields] = await pool.execute('SELECT * FROM categogy WHERE type = ?', [inputType])
+                data = rows
+            } else if (inputType === 'ACCESSORIES') {
+                const [rows, fields] = await pool.execute('SELECT * FROM categogy WHERE type = ?', [inputType])
+                data = rows
+            } else {
+                const [rows, fields] = await pool.execute('SELECT * FROM categogy')
+                data = rows
+            }
             resolve({
                 errCode: 0,
                 errMessage: 'Ok',
@@ -231,5 +260,5 @@ const handleUpdateNewUser = (data) => {
 
 export {
     handleUserLogin, getAllCode, handleGetCategory, handleGetAllUser,
-    handleCreateNewUser, handleDeleteNewUser, handleUpdateNewUser
+    handleCreateNewUser, handleDeleteNewUser, handleUpdateNewUser, handleGetTypeAllCode
 }

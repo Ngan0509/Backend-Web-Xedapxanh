@@ -28,10 +28,10 @@ const handleGetAllAccessory = (accessoryId) => {
 const handleCreateNewAccessory = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const { category, productName, previewImg, priceNew, accessories } = data
+            const { category, productName, previewImg, priceNew, accessories_id } = data
             await pool.execute(
                 'INSERT INTO accessories(category_id, name, image, price_new, accessories_id) VALUES (?, ?, ?, ?, ?)',
-                [category, productName, previewImg, priceNew, accessories]
+                [category, productName, previewImg, priceNew, accessories_id]
             );
 
             resolve({
@@ -87,9 +87,9 @@ const handleUpdateNewAccessory = (data) => {
                     errMessage: "accessory is not found"
                 })
             }
-            const { category, productName, previewImg, priceNew, accessories } = data
+            const { category, productName, previewImg, priceNew, accessories_id } = data
             await pool.execute('UPDATE accessories SET category_id= ?, name= ?, image=?, price_new=?, accessories_id=?  where id = ?',
-                [category, productName, previewImg, priceNew, accessories, accessoryId]
+                [category, productName, previewImg, priceNew, accessories_id, accessoryId]
             );
             resolve({
                 errCode: 0,

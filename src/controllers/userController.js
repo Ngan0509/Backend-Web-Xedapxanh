@@ -76,7 +76,19 @@ const handleGetAllCode = async (req, res) => {
 
 const handleGetCategory = async (req, res) => {
     try {
-        let data = await userService.handleGetCategory()
+        let data = await userService.handleGetCategory(req.query.type)
+        return res.status(200).json(data)
+    } catch (error) {
+        return res.status(200).json({
+            errCode: -1,
+            errMessage: "Error from server"
+        })
+    }
+}
+
+const handleGetTypeAllCode = async (req, res) => {
+    try {
+        let data = await userService.handleGetTypeAllCode()
         return res.status(200).json(data)
     } catch (error) {
         return res.status(200).json({
@@ -88,5 +100,5 @@ const handleGetCategory = async (req, res) => {
 
 export {
     handleLogin, handleGetAllCode, handleGetCategory, handleGetAllUser,
-    handleCreateNewUser, handleDeleteNewUser, handleUpdateNewUser
+    handleCreateNewUser, handleDeleteNewUser, handleUpdateNewUser, handleGetTypeAllCode
 }
