@@ -3,7 +3,13 @@ import pool from "../configs/connectDB";
 const handleGetAllFilter = (filterId) => {
     return new Promise(async (resolve, reject) => {
         try {
-            let filters = ""
+            let filters = []
+            if (!filterId) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'missing parameter'
+                })
+            }
             if (filterId === "All") {
                 const [rows, fields] = await pool.execute('SELECT id, category_id, nameEn, nameVi, type FROM filter')
                 filters = rows

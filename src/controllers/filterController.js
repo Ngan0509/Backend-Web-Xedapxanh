@@ -51,4 +51,5 @@ const handleDeleteNewFilter = async (req, res) => {
 
 export {
     handleCreateNewFilter, handleGetAllFilter, handleUpdateNewFilter, handleDeleteNewFilter
+
 }
