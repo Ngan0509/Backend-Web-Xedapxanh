@@ -122,6 +122,52 @@ const handleGetAllBicycle = (bicycleId) => {
     })
 }
 
+const handleGetDetailBicycle = (bicycleId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let data = {}
+            const [bicycle, a] = await pool.execute('SELECT id, category_id, name, image, price_new, price_old, discout FROM bicycle WHERE id=?', [bicycleId])
+            const [markdown, b] = await pool.execute('SELECT * FROM markdown WHERE bicycleId=?', [bicycleId])
+
+            const [specifications, c] = await pool.execute('SELECT * FROM specifications WHERE bicycleId=?', [bicycleId])
+
+            let markdownData, specificationsData = {}
+            const { contentHTML, contentMarkdown } = markdown[0]
+            markdownData = {
+                contentHTML,
+                contentMarkdown
+            }
+
+            const tien_ich = []
+            specifications.forEach(item => {
+                tien_ich.push(item.tien_ich)
+            })
+
+            const { chat_lieu_son, do_tuoi, chieu_cao, kich_thuoc_trong_luong,
+                tai_trong, tai_trong_yen_phu, thuong_hieu, noi_san_xuat, suon_xe, phuoc, kich_co_banh_xe,
+                vanh, lop_xe, loai_van_bom, bo_dia, bo_thang, tay_thang, loai_phanh_thang, bo_lip,
+                ghi_dong, chat_lieu_yen, chat_lieu_cot, hang
+            } = specifications[0]
+
+            specificationsData = {
+                chat_lieu_son, tien_ich, do_tuoi, chieu_cao, kich_thuoc_trong_luong,
+                tai_trong, tai_trong_yen_phu, thuong_hieu, noi_san_xuat, suon_xe, phuoc, kich_co_banh_xe,
+                vanh, lop_xe, loai_van_bom, bo_dia, bo_thang, tay_thang, loai_phanh_thang, bo_lip,
+                ghi_dong, chat_lieu_yen, chat_lieu_cot, hang
+            }
+
+            data = { ...bicycle[0], markdownData, specificationsData }
+            resolve({
+                errCode: 0,
+                errMessage: 'Get data is success',
+                data
+            })
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
 const handleCreateNewBicycle = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -198,6 +244,76 @@ const handleUpdateNewBicycle = (data) => {
     })
 }
 
+const handleCreateMarkDownBicycle = (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const { bicycleId, contentHTML, contentMarkdown, hasOldData } = data
+            if (hasOldData) {
+                await pool.execute(
+                    'UPDATE markdown SET contentHTML = ?, contentMarkdown = ? where bicycleId = ?',
+                    [contentHTML, contentMarkdown, bicycleId]
+                );
+
+            } else {
+                await pool.execute(
+                    'INSERT INTO markdown(bicycleId, contentHTML, contentMarkdown ) VALUES (?, ?, ?)',
+                    [bicycleId, contentHTML, contentMarkdown]
+                );
+            }
+
+            resolve({
+                errCode: 0,
+                errMessage: "Save markdown is success"
+            })
+
+
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
+const handleCreateSpecificationsBicycle = (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let result = data.tien_ich.map(item => ({
+                ...data,
+                tien_ich: item
+            }))
+
+            await pool.execute('DELETE FROM specifications WHERE bicycleId = ?', [data.bicycleId])
+
+            result.forEach(async (item) => {
+                const { bicycleId, chat_lieu_son, tien_ich, do_tuoi, chieu_cao, kich_thuoc_trong_luong,
+                    tai_trong, tai_trong_yen_phu, thuong_hieu, noi_san_xuat, suon_xe, phuoc, kich_co_banh_xe,
+                    vanh, lop_xe, loai_van_bom, bo_dia, bo_thang, tay_thang, loai_phanh_thang, bo_lip,
+                    ghi_dong, chat_lieu_yen, chat_lieu_cot, hang
+                } = item
+
+                await pool.execute(
+                    'INSERT INTO specifications(bicycleId, chat_lieu_son, tien_ich, do_tuoi, chieu_cao, kich_thuoc_trong_luong, tai_trong, tai_trong_yen_phu, thuong_hieu, noi_san_xuat, suon_xe, phuoc, kich_co_banh_xe, vanh, lop_xe, loai_van_bom, bo_dia, bo_thang, tay_thang, loai_phanh_thang, bo_lip, ghi_dong, chat_lieu_yen, chat_lieu_cot, hang) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                    [
+                        bicycleId, chat_lieu_son, tien_ich, do_tuoi, chieu_cao, kich_thuoc_trong_luong,
+                        tai_trong, tai_trong_yen_phu, thuong_hieu, noi_san_xuat, suon_xe, phuoc, kich_co_banh_xe,
+                        vanh, lop_xe, loai_van_bom, bo_dia, bo_thang, tay_thang, loai_phanh_thang, bo_lip,
+                        ghi_dong, chat_lieu_yen, chat_lieu_cot, hang
+                    ]
+                );
+            })
+
+            resolve({
+                errCode: 0,
+                errMessage: "Save new specifications is success"
+            })
+
+
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
 export {
-    handleGetAllBicycle, handleCreateNewBicycle, handleDeleteNewBicycle, handleUpdateNewBicycle
+    handleGetAllBicycle, handleGetDetailBicycle, handleCreateNewBicycle, handleDeleteNewBicycle,
+    handleUpdateNewBicycle, handleCreateMarkDownBicycle, handleCreateSpecificationsBicycle
 }

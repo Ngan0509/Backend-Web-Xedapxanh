@@ -4,6 +4,7 @@ import * as userController from '../controllers/userController'
 import * as bicycleController from '../controllers/bicycleController'
 import * as accessoryController from '../controllers/accessoryController'
 import * as filterController from '../controllers/filterController'
+import * as cartController from '../controllers/cartController'
 
 let router = express.Router();
 
@@ -24,6 +25,11 @@ const initAPIRoute = (app) => {
     router.put("/api/update-bicycle", bicycleController.handleUpdateNewBicycle)
     router.delete("/api/delete-bicycle", bicycleController.handleDeleteNewBicycle)
 
+    router.get("/api/get-detail-bicycle", bicycleController.handleGetDetailBicycle)
+    router.post("/api/create-markdown-bicycle", bicycleController.handleCreateMarkDownBicycle)
+    router.post("/api/create-specifications-bicycle", bicycleController.handleCreateSpecificationsBicycle)
+
+
     router.get("/api/get-all-accessory", accessoryController.handleGetAllAccessory)
     router.post("/api/create-new-accessory", accessoryController.handleCreateNewAccessory)
     router.put("/api/update-accessory", accessoryController.handleUpdateNewAccessory)
@@ -33,6 +39,11 @@ const initAPIRoute = (app) => {
     router.post("/api/create-new-filter", filterController.handleCreateNewFilter)
     router.put("/api/update-filter", filterController.handleUpdateNewFilter)
     router.delete("/api/delete-filter", filterController.handleDeleteNewFilter)
+
+    router.get("/api/get-all-cart", cartController.handleGetAllCart)
+    router.post("/api/create-new-cart", cartController.handleCreateNewCart)
+    router.put("/api/update-cart", cartController.handleUpdateNewCart)
+    router.delete("/api/delete-cart", cartController.handleDeleteNewCart)
 
     return app.use('/', router)
 }
