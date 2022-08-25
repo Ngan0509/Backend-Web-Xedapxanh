@@ -15,7 +15,7 @@ const handleGetAllCart = (cartId) => {
                 carts = rows
             }
 
-            const [bicycles, fields] = await pool.execute('SELECT id, name, image FROM bicycle')
+            const [bicycles, fields] = await pool.execute('SELECT id, name, image, price_new, price_old FROM bicycle')
 
             let result = carts.map((item) => {
                 let productData = {}
@@ -23,7 +23,9 @@ const handleGetAllCart = (cartId) => {
                     if (bicycle.id === item.product_id) {
                         productData = {
                             name: bicycle.name,
-                            image: bicycle.image
+                            image: bicycle.image,
+                            price_new: bicycle.price_new,
+                            price_old: bicycle.price_old,
                         }
                     }
                 })

@@ -127,34 +127,41 @@ const handleGetDetailBicycle = (bicycleId) => {
         try {
             let data = {}
             const [bicycle, a] = await pool.execute('SELECT id, category_id, name, image, price_new, price_old, discout FROM bicycle WHERE id=?', [bicycleId])
+
             const [markdown, b] = await pool.execute('SELECT * FROM markdown WHERE bicycleId=?', [bicycleId])
 
             const [specifications, c] = await pool.execute('SELECT * FROM specifications WHERE bicycleId=?', [bicycleId])
 
-            let markdownData, specificationsData = {}
-            const { contentHTML, contentMarkdown } = markdown[0]
-            markdownData = {
-                contentHTML,
-                contentMarkdown
+            let markdownData = {}, specificationsData = {}
+
+            if (markdown.length > 0) {
+                const { contentHTML, contentMarkdown } = markdown[0]
+                markdownData = {
+                    contentHTML,
+                    contentMarkdown
+                }
             }
 
-            const tien_ich = []
-            specifications.forEach(item => {
-                tien_ich.push(item.tien_ich)
-            })
+            if (specifications.length > 0) {
+                const tien_ich = []
+                specifications.forEach(item => {
+                    tien_ich.push(item.tien_ich)
+                })
 
-            const { chat_lieu_son, do_tuoi, chieu_cao, kich_thuoc_trong_luong,
-                tai_trong, tai_trong_yen_phu, thuong_hieu, noi_san_xuat, suon_xe, phuoc, kich_co_banh_xe,
-                vanh, lop_xe, loai_van_bom, bo_dia, bo_thang, tay_thang, loai_phanh_thang, bo_lip,
-                ghi_dong, chat_lieu_yen, chat_lieu_cot, hang
-            } = specifications[0]
+                const { chat_lieu_son, do_tuoi, chieu_cao, kich_thuoc_trong_luong,
+                    tai_trong, tai_trong_yen_phu, thuong_hieu, noi_san_xuat, suon_xe, phuoc, kich_co_banh_xe,
+                    vanh, lop_xe, loai_van_bom, bo_dia, bo_thang, tay_thang, loai_phanh_thang, bo_lip,
+                    ghi_dong, chat_lieu_yen, chat_lieu_cot, hang
+                } = specifications[0]
 
-            specificationsData = {
-                chat_lieu_son, tien_ich, do_tuoi, chieu_cao, kich_thuoc_trong_luong,
-                tai_trong, tai_trong_yen_phu, thuong_hieu, noi_san_xuat, suon_xe, phuoc, kich_co_banh_xe,
-                vanh, lop_xe, loai_van_bom, bo_dia, bo_thang, tay_thang, loai_phanh_thang, bo_lip,
-                ghi_dong, chat_lieu_yen, chat_lieu_cot, hang
+                specificationsData = {
+                    chat_lieu_son, tien_ich, do_tuoi, chieu_cao, kich_thuoc_trong_luong,
+                    tai_trong, tai_trong_yen_phu, thuong_hieu, noi_san_xuat, suon_xe, phuoc, kich_co_banh_xe,
+                    vanh, lop_xe, loai_van_bom, bo_dia, bo_thang, tay_thang, loai_phanh_thang, bo_lip,
+                    ghi_dong, chat_lieu_yen, chat_lieu_cot, hang
+                }
             }
+
 
             data = { ...bicycle[0], markdownData, specificationsData }
             resolve({
