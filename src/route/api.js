@@ -6,6 +6,8 @@ import * as accessoryController from '../controllers/accessoryController'
 import * as filterController from '../controllers/filterController'
 import * as cartController from '../controllers/cartController'
 
+import * as clientController from '../controllers/clientController'
+
 let router = express.Router();
 
 const initAPIRoute = (app) => {
@@ -19,6 +21,9 @@ const initAPIRoute = (app) => {
     router.post("/api/create-new-user", userController.handleCreateNewUser)
     router.put("/api/update-user", userController.handleUpdateNewUser)
     router.delete("/api/delete-user", userController.handleDeleteNewUser)
+
+    router.post("/api/signup-client", clientController.handleSignUpClient)
+    router.post("/api/login-client", clientController.handleLogInClient)
 
     router.get("/api/get-all-bicycle", bicycleController.handleGetAllBicycle)
     router.post("/api/create-new-bicycle", bicycleController.handleCreateNewBicycle)
