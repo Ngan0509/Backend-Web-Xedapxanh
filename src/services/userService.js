@@ -78,7 +78,7 @@ const getAllCode = (typeInput) => {
             }
 
             let data = []
-            if (typeInput === 'ROLE' || typeInput === 'GENDER' || typeInput === 'PROVINCE') {
+            if (typeInput === 'ROLE' || typeInput === 'GENDER' || typeInput === 'PROVINCE' || typeInput === 'DELIVERY' || typeInput === 'PAYMENT') {
                 let [rows, fields] = await pool.execute('SELECT * FROM allcodeuser WHERE type = ?', [typeInput])
                 data = rows
             } else {

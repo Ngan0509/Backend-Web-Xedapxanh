@@ -5,6 +5,7 @@ import * as bicycleController from '../controllers/bicycleController'
 import * as accessoryController from '../controllers/accessoryController'
 import * as filterController from '../controllers/filterController'
 import * as cartController from '../controllers/cartController'
+import * as checkoutController from '../controllers/checkoutController'
 
 import * as clientController from '../controllers/clientController'
 
@@ -49,6 +50,10 @@ const initAPIRoute = (app) => {
     router.post("/api/create-new-cart", cartController.handleCreateNewCart)
     router.put("/api/update-cart", cartController.handleUpdateNewCart)
     router.delete("/api/delete-cart", cartController.handleDeleteNewCart)
+
+    router.get("/api/get-all-checkout", checkoutController.handleGetAllCheckout)
+    router.post("/api/create-new-checkout", checkoutController.handleCreateNewCheckout)
+    router.post("/api/update-statusId-checkout", checkoutController.handleUpdateStatusIdCheckout)
 
     return app.use('/', router)
 }
