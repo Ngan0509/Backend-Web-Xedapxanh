@@ -2,7 +2,7 @@ import * as checkoutService from "../services/checkoutService"
 
 const handleGetAllCheckout = async (req, res) => {
     try {
-        let resp = await checkoutService.handleGetAllCheckout(req.query.id)
+        let resp = await checkoutService.handleGetAllCheckout(req.query.id, req.query.role)
         return res.status(200).json(resp)
     } catch (error) {
         return res.status(200).json({

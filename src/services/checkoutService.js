@@ -7,7 +7,7 @@ const buildURLEmail = (token) => {
     let result = `${process.env.URL_REACT}/home/cart/ordercomplete?token=${token}`
     return result
 }
-const handleGetAllCheckout = (checkoutId) => {
+const handleGetAllCheckout = (checkoutId, role) => {
     return new Promise(async (resolve, reject) => {
         try {
             let checkouts = []
@@ -18,13 +18,34 @@ const handleGetAllCheckout = (checkoutId) => {
                 })
             }
             if (checkoutId === "All") {
-                const [rows, fields] = await pool.execute('SELECT * FROM checkout')
-                checkouts = rows
+                if (role === 'AdminS2') {
+                    const [rows, fields] = await pool.execute('SELECT * FROM checkout WHERE statusId= ?', ['S2'])
+                    checkouts = rows
+                } else if (role === 'ShipperS3') {
+                    const [rows, fields] = await pool.execute('SELECT * FROM checkout WHERE statusId= ?', ['S3'])
+                    checkouts = rows
+                } else if (role === 'ShipperS4') {
+                    const [rows, fields] = await pool.execute('SELECT * FROM checkout WHERE statusId= ?', ['S4'])
+                    checkouts = rows
+                } else if (role === 'ShipperS5') {
+                    const [rows, fields] = await pool.execute('SELECT * FROM checkout WHERE statusId= ?', ['S5'])
+                    checkouts = rows
+                } else if (role === 'AdminS6') {
+                    const [rows, fields] = await pool.execute('SELECT * FROM checkout WHERE statusId= ?', ['S6'])
+                    checkouts = rows
+                } else {
+                    const [rows, fields] = await pool.execute('SELECT * FROM checkout')
+                    checkouts = rows
+                }
             }
 
             const [clients, b] = await pool.execute('SELECT id, fullname, email, phoneNumber, genderId FROM client')
 
             const [allcode, c] = await pool.execute('SELECT keyMap, valueEn, valueVi FROM allcodeuser')
+
+            const [orderDetails, d] = await pool.execute('SELECT * FROM detail_order')
+
+            const [bicycles, f] = await pool.execute('SELECT id, name, image, price_new, price_old FROM bicycle')
 
             let result = checkouts.map((checkout) => {
                 let clientData = {}
@@ -41,7 +62,38 @@ const handleGetAllCheckout = (checkoutId) => {
                     })
                 }
 
-                let deliveryData = {}, paymentData = {}
+                let orderDetailArr = []
+                if (orderDetails.length > 0) {
+                    orderDetails.forEach(order => {
+                        if (order.checkout_id === checkout.id) {
+                            orderDetailArr.push(order)
+                        }
+                    })
+                }
+
+                if (orderDetailArr.length > 0) {
+                    let productData = {}
+                    orderDetailArr = orderDetailArr.map(item => {
+                        if (item.type === 'BICYCLE') {
+                            bicycles.forEach(bicycle => {
+                                if (bicycle.id === item.product_id) {
+                                    productData = {
+                                        name: bicycle.name,
+                                        image: bicycle.image,
+                                        price_new: bicycle.price_new,
+                                        price_old: bicycle.price_old,
+                                    }
+                                }
+                            })
+                        }
+                        return {
+                            ...item,
+                            productData
+                        }
+                    })
+                }
+
+                let deliveryData = {}, paymentData = {}, statusData = {}
                 allcode.forEach((item) => {
                     if (item.keyMap === checkout.delivery_id) {
                         deliveryData = {
@@ -56,12 +108,21 @@ const handleGetAllCheckout = (checkoutId) => {
                             valueVi: item.valueVi
                         }
                     }
+
+                    if (item.keyMap === checkout.statusId) {
+                        statusData = {
+                            valueEn: item.valueEn,
+                            valueVi: item.valueVi
+                        }
+                    }
                 })
                 return {
                     ...checkout,
                     clientData,
                     deliveryData,
-                    paymentData
+                    paymentData,
+                    statusData,
+                    orderDetailArr
                 }
             })
 
@@ -179,7 +240,7 @@ const handleCreateNewCheckout = (data) => {
 const handleUpdateStatusIdCheckout = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const { token } = data
+            const { token, statusId } = data
             const [rows, fields] = await pool.execute('SELECT * FROM checkout WHERE token = ?', [token])
             let checkout = rows[0]
             if (!checkout) {
@@ -188,9 +249,28 @@ const handleUpdateStatusIdCheckout = (data) => {
                     errMessage: "checkout is not found"
                 })
             }
-            await pool.execute('UPDATE checkout SET statusId= ? where token = ?',
-                ['S2', token]
-            );
+
+            if (statusId === 'S1') {
+                await pool.execute('UPDATE checkout SET statusId= ? where token = ?',
+                    ['S2', token]
+                );
+            } else if (statusId === 'S2') {
+                await pool.execute('UPDATE checkout SET statusId= ? where token = ?',
+                    ['S3', token]
+                );
+            } else if (statusId === 'S3') {
+                await pool.execute('UPDATE checkout SET statusId= ? where token = ?',
+                    ['S4', token]
+                );
+            } else if (statusId === 'S4') {
+                await pool.execute('UPDATE checkout SET statusId= ? where token = ?',
+                    ['S5', token]
+                );
+            } else if (statusId === 'S5') {
+                await pool.execute('UPDATE checkout SET statusId= ? where token = ?',
+                    ['S6', token]
+                );
+            }
             resolve({
                 errCode: 0,
                 errMessage: "Update data is succeed!"

@@ -19,16 +19,18 @@ const handleGetAllCart = (cartId) => {
 
             let result = carts.map((item) => {
                 let productData = {}
-                bicycles.forEach(bicycle => {
-                    if (bicycle.id === item.product_id) {
-                        productData = {
-                            name: bicycle.name,
-                            image: bicycle.image,
-                            price_new: bicycle.price_new,
-                            price_old: bicycle.price_old,
+                if (item.type === 'BICYCLE') {
+                    bicycles.forEach(bicycle => {
+                        if (bicycle.id === item.product_id) {
+                            productData = {
+                                name: bicycle.name,
+                                image: bicycle.image,
+                                price_new: bicycle.price_new,
+                                price_old: bicycle.price_old,
+                            }
                         }
-                    }
-                })
+                    })
+                }
                 return {
                     ...item,
                     productData

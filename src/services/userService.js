@@ -22,7 +22,9 @@ const handleUserLogin = (email, password) => {
                                 id: user.id,
                                 email: user.email,
                                 roleId: user.roleId,
-                                fullname: user.name
+                                fullname: user.name,
+                                city_id: user.city_id,
+                                district_id: user.district_id
                             }
                         }
                     } else {
@@ -146,11 +148,11 @@ const handleGetAllUser = (userId) => {
         try {
             let users = ""
             if (userId === "All") {
-                const [rows, fields] = await pool.execute('SELECT id, name, email, phoneNumber, roleId, genderId FROM admin')
+                const [rows, fields] = await pool.execute('SELECT id, name, email, phoneNumber, roleId, genderId, city_id, district_id FROM admin')
                 users = rows
             }
             if (userId && userId !== "All") {
-                const [rows, fields] = await pool.execute('SELECT id, name, email, phoneNumber, roleId, genderId FROM admin WHERE id = ?', [userId])
+                const [rows, fields] = await pool.execute('SELECT id, name, email, phoneNumber, roleId, genderId, city_id, district_id FROM admin WHERE id = ?', [userId])
                 users = rows[0]
             }
             resolve({
@@ -176,8 +178,8 @@ const handleCreateNewUser = (data) => {
             } else {
                 let hashPasswordFromBcrypt = await hashUserPassword(data.password)
                 await pool.execute(
-                    'INSERT INTO admin(name, email, password ,phoneNumber, roleId, genderId) VALUES (?, ?, ?, ?, ?, ?)',
-                    [data.fullname, data.email, hashPasswordFromBcrypt, data.phoneNumber, data.role, data.gender]
+                    'INSERT INTO admin(name, email, password ,phoneNumber, roleId, genderId, city_id, district_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                    [data.fullname, data.email, hashPasswordFromBcrypt, data.phoneNumber, data.role, data.gender, data.city_id, data.district_id]
                 );
 
                 resolve({
@@ -245,8 +247,8 @@ const handleUpdateNewUser = (data) => {
                     errMessage: "User is not found"
                 })
             }
-            await pool.execute('UPDATE admin SET name= ?, phoneNumber= ?, genderId=?, roleId=? where id = ?',
-                [data.fullname, data.phoneNumber, data.gender, data.role, data.id]
+            await pool.execute('UPDATE admin SET name= ?, phoneNumber= ?, genderId=?, roleId=?, city_id=?, district_id=? where id = ?',
+                [data.fullname, data.phoneNumber, data.gender, data.role, data.city_id, data.district_id, data.id]
             );
             resolve({
                 errCode: 0,
