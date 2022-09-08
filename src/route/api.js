@@ -25,6 +25,8 @@ const initAPIRoute = (app) => {
 
     router.post("/api/signup-client", clientController.handleSignUpClient)
     router.post("/api/login-client", clientController.handleLogInClient)
+    router.put("/api/update-client", clientController.handleUpdateNewClient)
+    router.delete("/api/delete-client", clientController.handleDeleteNewClient)
 
     router.get("/api/get-all-bicycle", bicycleController.handleGetAllBicycle)
     router.post("/api/create-new-bicycle", bicycleController.handleCreateNewBicycle)

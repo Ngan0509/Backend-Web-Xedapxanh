@@ -13,8 +13,11 @@ const handleLogInClient = (email, password) => {
                 let user = rows[0]
                 if (user) {
                     let checkPass = bcrypt.compareSync(password, user.password)
+                    let imageBase64 = ''
+                    if (user.image) {
+                        imageBase64 = Buffer.from(user.image, 'base64').toString('binary')
+                    }
                     if (checkPass) {
-                        console.log(user)
                         userData = {
                             errCode: 0,
                             errMessage: "Ok",
@@ -22,7 +25,8 @@ const handleLogInClient = (email, password) => {
                                 id: user.id,
                                 email: user.email,
                                 fullname: user.fullname,
-                                phoneNumber: user.phoneNumber
+                                phoneNumber: user.phoneNumber,
+                                image: imageBase64
                             }
                         }
                     } else {
@@ -106,7 +110,63 @@ const hashUserPassword = (password) => {
     })
 }
 
+const handleDeleteNewClient = (clientId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const [rows, fields] = await pool.execute('SELECT * FROM client WHERE id = ?', [clientId])
+            let client = rows[0]
+            if (!client) {
+                resolve({
+                    errCode: 2,
+                    errMessage: "client is not found"
+                })
+            }
+            await pool.execute('DELETE FROM client WHERE id = ?', [clientId])
+
+            resolve({
+                errCode: 0,
+                errMessage: "Delete succeed!"
+            })
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
+const handleUpdateNewClient = (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let clientId = data.id
+            if (!clientId) {
+                resolve({
+                    errCode: 1,
+                    errMessage: "Missing parameters"
+                })
+            }
+            const [rows, fields] = await pool.execute('SELECT * FROM client WHERE id = ?', [clientId])
+            let client = rows[0]
+            if (!client) {
+                resolve({
+                    errCode: 2,
+                    errMessage: "client is not found"
+                })
+            }
+            await pool.execute('UPDATE client SET fullname= ?, image= ?, genderId= ?, birthday= ? where id = ?',
+                [data.fullname, data.image, data.gender, data.birthday, clientId]
+            );
+            resolve({
+                errCode: 0,
+                errMessage: "Update data is succeed!"
+            })
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
 export {
     handleLogInClient,
-    handleSignUpClient
+    handleSignUpClient,
+    handleUpdateNewClient,
+    handleDeleteNewClient
 }

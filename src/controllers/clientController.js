@@ -25,7 +25,33 @@ const handleSignUpClient = async (req, res) => {
     }
 }
 
+const handleUpdateNewClient = async (req, res) => {
+    try {
+        let resp = await clientService.handleUpdateNewClient(req.body)
+        return res.status(200).json(resp)
+    } catch (error) {
+        return res.status(200).json({
+            errCode: -1,
+            errMessage: "Error from server"
+        })
+    }
+}
+
+const handleDeleteNewClient = async (req, res) => {
+    try {
+        let resp = await clientService.handleDeleteNewClient(req.query.id)
+        return res.status(200).json(resp)
+    } catch (error) {
+        return res.status(200).json({
+            errCode: -1,
+            errMessage: "Error from server"
+        })
+    }
+}
+
 export {
     handleLogInClient,
-    handleSignUpClient
+    handleSignUpClient,
+    handleUpdateNewClient,
+    handleDeleteNewClient
 }

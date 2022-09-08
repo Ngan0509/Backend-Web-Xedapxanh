@@ -37,6 +37,9 @@ const handleGetAllCheckout = (checkoutId, role) => {
                     const [rows, fields] = await pool.execute('SELECT * FROM checkout')
                     checkouts = rows
                 }
+            } else if (checkoutId && checkoutId !== 'All' && role === 'Client') {
+                const [rows, fields] = await pool.execute('SELECT * FROM checkout WHERE client_id', [checkoutId])
+                checkouts = rows
             }
 
             const [clients, b] = await pool.execute('SELECT id, fullname, email, phoneNumber, genderId FROM client')
@@ -269,6 +272,14 @@ const handleUpdateStatusIdCheckout = (data) => {
             } else if (statusId === 'S5') {
                 await pool.execute('UPDATE checkout SET statusId= ? where token = ?',
                     ['S6', token]
+                );
+            } else if (statusId === 'Cancel') {
+                await pool.execute('UPDATE checkout SET statusId= ? where token = ?',
+                    ['S7', token]
+                );
+            } else if (statusId === 'S7') {
+                await pool.execute('UPDATE checkout SET statusId= ? where token = ?',
+                    ['S2', token]
                 );
             }
             resolve({
