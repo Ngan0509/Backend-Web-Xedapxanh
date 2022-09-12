@@ -14,6 +14,18 @@ const handleGetAllAccessory = (accessoryId) => {
                 const [rows, fields] = await pool.execute('SELECT id, category_id, name, image, price_new, accessories_id FROM accessories WHERE category_id = ?', [accessoryId])
                 accessories = rows
             }
+
+            accessories = accessories.map(accessory => {
+                let imageBase64 = ''
+                if (accessory.image) {
+                    imageBase64 = Buffer.from(accessory.image, 'base64').toString('binary')
+                }
+                return {
+                    ...accessory,
+                    image: imageBase64
+                }
+            })
+
             resolve({
                 errCode: 0,
                 errMessage: 'Get data is success',

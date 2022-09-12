@@ -18,7 +18,13 @@ const handleGetAllBicycle = (bicycleId) => {
 
             const [categories, d] = await pool.execute('SELECT * FROM categogy')
 
+            const [favorites, e] = await pool.execute('SELECT * FROM favorite')
+
             let result = bicycles.map((bicycle) => {
+                let imageBase64 = ''
+                if (bicycle.image) {
+                    imageBase64 = Buffer.from(bicycle.image, 'base64').toString('binary')
+                }
                 let categoryData, priceSpaceData, brandData, useTargetData, weelSizeData, frameMaterialData, riderHeightData, brakeData, diskNumberData, utilitiesData
                 allcode.forEach((item) => {
                     if (item.keyMap === bicycle.price_space_id) {
@@ -94,8 +100,26 @@ const handleGetAllBicycle = (bicycleId) => {
                         }
                     }
                 })
+
+                let favoriteArr = []
+                if (favorites.length > 0) {
+                    favorites.forEach((item) => {
+                        if (item.product_id === bicycle.id) {
+                            favoriteArr.push(item.num_star)
+                        }
+                    })
+                }
+
+                let num_star_avg = 0
+                if (favoriteArr.length > 0) {
+                    let sum = favoriteArr.reduce((a, b) => a + b)
+
+                    num_star_avg = Math.round(sum / favoriteArr.length)
+                }
                 return {
                     ...bicycle,
+                    num_star_avg,
+                    image: imageBase64,
                     categoryData,
                     priceSpaceData,
                     brandData,

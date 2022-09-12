@@ -21,10 +21,14 @@ const handleGetAllCart = (cartId) => {
                 let productData = {}
                 if (item.type === 'BICYCLE') {
                     bicycles.forEach(bicycle => {
+                        let imageBase64 = ''
+                        if (bicycle.image) {
+                            imageBase64 = Buffer.from(bicycle.image, 'base64').toString('binary')
+                        }
                         if (bicycle.id === item.product_id) {
                             productData = {
                                 name: bicycle.name,
-                                image: bicycle.image,
+                                image: imageBase64,
                                 price_new: bicycle.price_new,
                                 price_old: bicycle.price_old,
                             }

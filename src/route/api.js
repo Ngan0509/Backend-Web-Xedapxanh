@@ -8,6 +8,9 @@ import * as cartController from '../controllers/cartController'
 import * as checkoutController from '../controllers/checkoutController'
 
 import * as clientController from '../controllers/clientController'
+import * as commentController from '../controllers/commentController'
+import * as storeController from '../controllers/storeController'
+import * as favoriteController from '../controllers/favoriteController'
 
 let router = express.Router();
 
@@ -56,6 +59,18 @@ const initAPIRoute = (app) => {
     router.get("/api/get-all-checkout", checkoutController.handleGetAllCheckout)
     router.post("/api/create-new-checkout", checkoutController.handleCreateNewCheckout)
     router.post("/api/update-statusId-checkout", checkoutController.handleUpdateStatusIdCheckout)
+
+    router.get("/api/get-all-comment", commentController.handleGetAllComment)
+    router.post("/api/create-new-comment", commentController.handleCreateNewComment)
+    router.put("/api/update-comment", commentController.handleUpdateNewComment)
+    router.delete("/api/delete-comment", commentController.handleDeleteNewComment)
+
+    router.get("/api/get-all-store", storeController.handleGetAllStore)
+    router.post("/api/create-new-store", storeController.handleCreateNewStore)
+    router.put("/api/update-store", storeController.handleUpdateNewStore)
+    router.delete("/api/delete-store", storeController.handleDeleteNewStore)
+
+    router.post("/api/create-new-favorite", favoriteController.handleCreateNewFavorite)
 
     return app.use('/', router)
 }
