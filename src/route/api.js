@@ -40,6 +40,7 @@ const initAPIRoute = (app) => {
     router.post("/api/create-markdown-bicycle", bicycleController.handleCreateMarkDownBicycle)
     router.post("/api/create-specifications-bicycle", bicycleController.handleCreateSpecificationsBicycle)
 
+    router.get("/api/get-detail-accessory", accessoryController.handleGetDetailAccessories)
 
     router.get("/api/get-all-accessory", accessoryController.handleGetAllAccessory)
     router.post("/api/create-new-accessory", accessoryController.handleCreateNewAccessory)

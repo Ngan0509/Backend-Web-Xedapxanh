@@ -38,7 +38,7 @@ const handleGetAllCheckout = (checkoutId, role) => {
                     checkouts = rows
                 }
             } else if (checkoutId && checkoutId !== 'All' && role === 'Client') {
-                const [rows, fields] = await pool.execute('SELECT * FROM checkout WHERE client_id', [checkoutId])
+                const [rows, fields] = await pool.execute('SELECT * FROM checkout WHERE client_id= ?', [checkoutId])
                 checkouts = rows
             }
 
@@ -49,6 +49,7 @@ const handleGetAllCheckout = (checkoutId, role) => {
             const [orderDetails, d] = await pool.execute('SELECT * FROM detail_order')
 
             const [bicycles, f] = await pool.execute('SELECT id, name, image, price_new, price_old FROM bicycle')
+            const [accessories, g] = await pool.execute('SELECT id, name, image, price_new FROM accessories')
 
             let result = checkouts.map((checkout) => {
                 let clientData = {}
@@ -89,6 +90,20 @@ const handleGetAllCheckout = (checkoutId, role) => {
                                         image: imageBase64,
                                         price_new: bicycle.price_new,
                                         price_old: bicycle.price_old,
+                                    }
+                                }
+                            })
+                        } else if (item.type === 'ACCESSORIES') {
+                            accessories.forEach(accessory => {
+                                let imageBase64 = ''
+                                if (accessory.image) {
+                                    imageBase64 = Buffer.from(accessory.image, 'base64').toString('binary')
+                                }
+                                if (accessory.id === item.product_id) {
+                                    productData = {
+                                        name: accessory.name,
+                                        image: imageBase64,
+                                        price_new: accessory.price_new
                                     }
                                 }
                             })
@@ -183,19 +198,40 @@ const handleCreateNewCheckout = (data) => {
             let [orderDetailArr, f] = await pool.execute('SELECT * FROM detail_order WHERE checkout_id = ?', [checkout_id])
 
             const [bicycles, g] = await pool.execute('SELECT id, name, image, price_new, price_old FROM bicycle')
+            const [accessories, h] = await pool.execute('SELECT id, name, image, price_new FROM accessories')
 
             let orderDetails = orderDetailArr.map((item) => {
                 let productData = {}
-                bicycles.forEach(bicycle => {
-                    if (bicycle.id === item.product_id) {
-                        productData = {
-                            name: bicycle.name,
-                            image: bicycle.image,
-                            price_new: bicycle.price_new,
-                            price_old: bicycle.price_old,
+                if (item.type === 'BICYCLE') {
+                    bicycles.forEach(bicycle => {
+                        let imageBase64 = ''
+                        if (bicycle.image) {
+                            imageBase64 = Buffer.from(bicycle.image, 'base64').toString('binary')
                         }
-                    }
-                })
+                        if (bicycle.id === item.product_id) {
+                            productData = {
+                                name: bicycle.name,
+                                image: imageBase64,
+                                price_new: bicycle.price_new,
+                                price_old: bicycle.price_old,
+                            }
+                        }
+                    })
+                } else if (item.type === 'ACCESSORIES') {
+                    accessories.forEach(accessory => {
+                        let imageBase64 = ''
+                        if (accessory.image) {
+                            imageBase64 = Buffer.from(accessory.image, 'base64').toString('binary')
+                        }
+                        if (accessory.id === item.product_id) {
+                            productData = {
+                                name: accessory.name,
+                                image: imageBase64,
+                                price_new: accessory.price_new
+                            }
+                        }
+                    })
+                }
                 return {
                     ...item,
                     productData

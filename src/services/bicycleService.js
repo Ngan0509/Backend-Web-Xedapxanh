@@ -1,5 +1,7 @@
 import pool from "../configs/connectDB";
 import bcrypt from 'bcryptjs';
+var Buffer = require('buffer/').Buffer
+
 const salt = bcrypt.genSaltSync(10);
 
 const handleGetAllBicycle = (bicycleId) => {

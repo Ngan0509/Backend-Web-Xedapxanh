@@ -1,4 +1,5 @@
 import pool from "../configs/connectDB";
+var Buffer = require('buffer/').Buffer
 
 const handleGetAllStore = (storeId) => {
     return new Promise(async (resolve, reject) => {

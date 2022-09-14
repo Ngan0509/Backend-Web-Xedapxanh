@@ -15,8 +15,8 @@ const handleGetAllCart = (cartId) => {
                 carts = rows
             }
 
-            const [bicycles, fields] = await pool.execute('SELECT id, name, image, price_new, price_old FROM bicycle')
-
+            const [bicycles, a] = await pool.execute('SELECT id, name, image, price_new, price_old FROM bicycle')
+            const [accessories, b] = await pool.execute('SELECT id, name, image, price_new FROM accessories')
             let result = carts.map((item) => {
                 let productData = {}
                 if (item.type === 'BICYCLE') {
@@ -31,6 +31,20 @@ const handleGetAllCart = (cartId) => {
                                 image: imageBase64,
                                 price_new: bicycle.price_new,
                                 price_old: bicycle.price_old,
+                            }
+                        }
+                    })
+                } else if (item.type === 'ACCESSORIES') {
+                    accessories.forEach(accessory => {
+                        let imageBase64 = ''
+                        if (accessory.image) {
+                            imageBase64 = Buffer.from(accessory.image, 'base64').toString('binary')
+                        }
+                        if (accessory.id === item.product_id) {
+                            productData = {
+                                name: accessory.name,
+                                image: imageBase64,
+                                price_new: accessory.price_new
                             }
                         }
                     })

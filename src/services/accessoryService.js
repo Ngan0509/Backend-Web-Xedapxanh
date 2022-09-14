@@ -1,5 +1,6 @@
 import pool from "../configs/connectDB";
 import bcrypt from 'bcryptjs';
+var Buffer = require('buffer/').Buffer
 const salt = bcrypt.genSaltSync(10);
 
 const handleGetAllAccessory = (accessoryId) => {
@@ -15,14 +16,29 @@ const handleGetAllAccessory = (accessoryId) => {
                 accessories = rows
             }
 
+            const [categories, d] = await pool.execute('SELECT * FROM categogy')
+
+
             accessories = accessories.map(accessory => {
                 let imageBase64 = ''
                 if (accessory.image) {
                     imageBase64 = Buffer.from(accessory.image, 'base64').toString('binary')
                 }
+
+                let categoryData = {}
+                categories.forEach((item) => {
+                    if (item.id === accessory.category_id) {
+                        categoryData = {
+                            valueEn: item.nameEn,
+                            valueVi: item.nameVi
+                        }
+                    }
+                })
+
                 return {
                     ...accessory,
-                    image: imageBase64
+                    image: imageBase64,
+                    categoryData
                 }
             })
 
@@ -30,6 +46,24 @@ const handleGetAllAccessory = (accessoryId) => {
                 errCode: 0,
                 errMessage: 'Get data is success',
                 data: accessories
+            })
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
+const handleGetDetailAccessories = (accessoryId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let data = {}
+            const [accessories, a] = await pool.execute('SELECT * FROM accessories WHERE id=?', [accessoryId])
+            data = accessories[0]
+
+            resolve({
+                errCode: 0,
+                errMessage: 'Get data is success',
+                data
             })
         } catch (error) {
             reject(error)
@@ -114,5 +148,5 @@ const handleUpdateNewAccessory = (data) => {
 }
 
 export {
-    handleGetAllAccessory, handleCreateNewAccessory, handleDeleteNewAccessory, handleUpdateNewAccessory
+    handleGetAllAccessory, handleGetDetailAccessories, handleCreateNewAccessory, handleDeleteNewAccessory, handleUpdateNewAccessory
 }

@@ -12,6 +12,18 @@ const handleGetAllAccessory = async (req, res) => {
     }
 }
 
+const handleGetDetailAccessories = async (req, res) => {
+    try {
+        let resp = await accessoryService.handleGetDetailAccessories(req.query.id)
+        return res.status(200).json(resp)
+    } catch (error) {
+        return res.status(200).json({
+            errCode: -1,
+            errMessage: "Error from server"
+        })
+    }
+}
+
 const handleCreateNewAccessory = async (req, res) => {
     try {
         let resp = await accessoryService.handleCreateNewAccessory(req.body)
@@ -49,5 +61,5 @@ const handleDeleteNewAccessory = async (req, res) => {
 }
 
 export {
-    handleGetAllAccessory, handleCreateNewAccessory, handleDeleteNewAccessory, handleUpdateNewAccessory
+    handleGetAllAccessory, handleGetDetailAccessories, handleCreateNewAccessory, handleDeleteNewAccessory, handleUpdateNewAccessory
 }
