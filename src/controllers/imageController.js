@@ -1,8 +1,8 @@
-import * as checkoutService from "../services/checkoutService"
+import * as imageService from "../services/imageService"
 
-const handleGetAllCheckout = async (req, res) => {
+const handleGetMultiImage = async (req, res) => {
     try {
-        let resp = await checkoutService.handleGetAllCheckout(req.query.id, req.query.role)
+        let resp = await imageService.handleGetMultiImage(req.query.id, req.query.type)
         return res.status(200).json(resp)
     } catch (error) {
         return res.status(200).json({
@@ -12,9 +12,9 @@ const handleGetAllCheckout = async (req, res) => {
     }
 }
 
-const handleCreateNewCheckout = async (req, res) => {
+const handleCreateMultiImage = async (req, res) => {
     try {
-        let resp = await checkoutService.handleCreateNewCheckout(req.body)
+        let resp = await imageService.handleCreateMultiImage(req.body)
         return res.status(200).json(resp)
     } catch (error) {
         return res.status(200).json({
@@ -24,9 +24,9 @@ const handleCreateNewCheckout = async (req, res) => {
     }
 }
 
-const handleUpdateStatusIdCheckout = async (req, res) => {
+const handleDeleteMultiImage = async (req, res) => {
     try {
-        let resp = await checkoutService.handleUpdateStatusIdCheckout(req.body)
+        let resp = await imageService.handleDeleteMultiImage(req.query.name)
         return res.status(200).json(resp)
     } catch (error) {
         return res.status(200).json({
@@ -37,6 +37,6 @@ const handleUpdateStatusIdCheckout = async (req, res) => {
 }
 
 export {
-    handleCreateNewCheckout, handleGetAllCheckout, handleUpdateStatusIdCheckout
+    handleGetMultiImage, handleCreateMultiImage, handleDeleteMultiImage
 
 }

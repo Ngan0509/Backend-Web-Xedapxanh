@@ -15,7 +15,6 @@ const handleGetAllCart = async (req, res) => {
 const handleCreateNewCart = async (req, res) => {
     try {
         let resp = await cartService.handleCreateNewCart(req.body)
-        console.log(resp)
         return res.status(200).json(resp)
     } catch (error) {
         return res.status(200).json({

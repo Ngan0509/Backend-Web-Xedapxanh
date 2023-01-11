@@ -14,7 +14,6 @@ const handleUserLogin = (email, password) => {
                 if (user) {
                     let checkPass = bcrypt.compareSync(password, user.password)
                     if (checkPass) {
-                        console.log(user)
                         userData = {
                             errCode: 0,
                             errMessage: "Ok",
@@ -153,7 +152,7 @@ const handleGetAllUser = (userId) => {
             }
             if (userId && userId !== "All") {
                 const [rows, fields] = await pool.execute('SELECT id, name, email, phoneNumber, roleId, genderId, city_id, district_id FROM admin WHERE id = ?', [userId])
-                users = rows[0]
+                users = rows
             }
             resolve({
                 errCode: 0,

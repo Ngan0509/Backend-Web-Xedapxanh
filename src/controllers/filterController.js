@@ -15,7 +15,6 @@ const handleGetAllFilter = async (req, res) => {
 const handleCreateNewFilter = async (req, res) => {
     try {
         let resp = await filterService.handleCreateNewFilter(req.body)
-        console.log(resp)
         return res.status(200).json(resp)
     } catch (error) {
         return res.status(200).json({

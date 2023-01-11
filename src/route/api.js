@@ -12,6 +12,8 @@ import * as commentController from '../controllers/commentController'
 import * as storeController from '../controllers/storeController'
 import * as favoriteController from '../controllers/favoriteController'
 
+import * as imageController from '../controllers/imageController'
+
 let router = express.Router();
 
 const initAPIRoute = (app) => {
@@ -70,6 +72,10 @@ const initAPIRoute = (app) => {
     router.post("/api/create-new-store", storeController.handleCreateNewStore)
     router.put("/api/update-store", storeController.handleUpdateNewStore)
     router.delete("/api/delete-store", storeController.handleDeleteNewStore)
+
+    router.get("/api/get-multi-image", imageController.handleGetMultiImage)
+    router.post("/api/create-multi-image", imageController.handleCreateMultiImage)
+    router.delete("/api/delete-multi_image", imageController.handleDeleteMultiImage)
 
     router.post("/api/create-new-favorite", favoriteController.handleCreateNewFavorite)
 

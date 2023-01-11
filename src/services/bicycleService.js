@@ -186,8 +186,11 @@ const handleGetDetailBicycle = (bicycleId) => {
                 }
             }
 
-
-            data = { ...bicycle[0], markdownData, specificationsData }
+            let imageBase64 = '';
+            if (bicycle[0].image) {
+                imageBase64 = Buffer.from(bicycle[0].image, 'base64').toString('binary')
+            }
+            data = { ...bicycle[0], image: imageBase64, markdownData, specificationsData }
             resolve({
                 errCode: 0,
                 errMessage: 'Get data is success',

@@ -1,6 +1,7 @@
 import express from 'express';
 import configViewEngine from './configs/viewEngine';
 import initAPIRoute from './route/api'
+import initWebRoute from './route/web'
 import bodyParser from "body-parser"
 
 
@@ -39,6 +40,7 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }))
 // set up view engine
 configViewEngine(app)
 
+initWebRoute(app)
 initAPIRoute(app)
 
 app.listen(port, () => {

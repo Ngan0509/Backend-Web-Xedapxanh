@@ -58,7 +58,14 @@ const handleGetDetailAccessories = (accessoryId) => {
         try {
             let data = {}
             const [accessories, a] = await pool.execute('SELECT * FROM accessories WHERE id=?', [accessoryId])
-            data = accessories[0]
+            let imageBase64 = '';
+            if (accessories[0].image) {
+                imageBase64 = Buffer.from(accessories[0].image, 'base64').toString('binary')
+            }
+            data = {
+                ...accessories[0],
+                image: imageBase64
+            }
 
             resolve({
                 errCode: 0,

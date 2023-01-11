@@ -164,7 +164,7 @@ const handleCreateNewCheckout = (data) => {
         try {
             let token = uuidv4(); // ⇨ '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d'
 
-            const { noi_nhan, ghi_chu, city_id, district_id, delivery_id, payment_id, client_id, sum_price, date, lang, statusId } = data
+            const { noi_nhan, ghi_chu, city_id, district_id, delivery_id, payment_id, client_id, sum_price, date, lang, statusId, listAllCart } = data
 
             await pool.execute(
                 'INSERT INTO checkout(noi_nhan, ghi_chu, city_id, district_id, delivery_id, payment_id, client_id, sum_price, date, statusId, token) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
@@ -174,19 +174,15 @@ const handleCreateNewCheckout = (data) => {
             const [checkouts, a] = await pool.execute('SELECT id FROM checkout WHERE token = ?', [token])
             const checkout_id = checkouts[0].id
 
-            const [carts, b] = await pool.execute('SELECT * FROM cart')
-
-            if (carts && carts.length > 0) {
-                carts.forEach(async (item) => {
-                    const { id, product_id, type, so_luong, price, sum_price } = item
+            if (listAllCart && listAllCart.length > 0) {
+                listAllCart.forEach(async (item) => {
+                    const { product_id, type, so_luong, price, sum_price } = item
 
                     await pool.execute(
                         'INSERT INTO detail_order(checkout_id, product_id, type, so_luong, price, sum_price) VALUES (?, ?, ?, ?, ?, ?)',
                         [checkout_id, product_id, type, so_luong, price, sum_price]
                     );
                 })
-
-                await pool.execute('DELETE FROM cart')
             }
 
             let [deliverys, c] = await pool.execute('SELECT * FROM allcodeuser WHERE keyMap = ?', [delivery_id])
@@ -195,48 +191,7 @@ const handleCreateNewCheckout = (data) => {
 
             let [clients, e] = await pool.execute('SELECT * FROM client WHERE id = ?', [client_id])
 
-            let [orderDetailArr, f] = await pool.execute('SELECT * FROM detail_order WHERE checkout_id = ?', [checkout_id])
-
-            const [bicycles, g] = await pool.execute('SELECT id, name, image, price_new, price_old FROM bicycle')
-            const [accessories, h] = await pool.execute('SELECT id, name, image, price_new FROM accessories')
-
-            let orderDetails = orderDetailArr.map((item) => {
-                let productData = {}
-                if (item.type === 'BICYCLE') {
-                    bicycles.forEach(bicycle => {
-                        let imageBase64 = ''
-                        if (bicycle.image) {
-                            imageBase64 = Buffer.from(bicycle.image, 'base64').toString('binary')
-                        }
-                        if (bicycle.id === item.product_id) {
-                            productData = {
-                                name: bicycle.name,
-                                image: imageBase64,
-                                price_new: bicycle.price_new,
-                                price_old: bicycle.price_old,
-                            }
-                        }
-                    })
-                } else if (item.type === 'ACCESSORIES') {
-                    accessories.forEach(accessory => {
-                        let imageBase64 = ''
-                        if (accessory.image) {
-                            imageBase64 = Buffer.from(accessory.image, 'base64').toString('binary')
-                        }
-                        if (accessory.id === item.product_id) {
-                            productData = {
-                                name: accessory.name,
-                                image: imageBase64,
-                                price_new: accessory.price_new
-                            }
-                        }
-                    })
-                }
-                return {
-                    ...item,
-                    productData
-                }
-            })
+            let orderDetails = listAllCart;
 
             let deliveryData = {}, paymentData = {}, clientData = {}
 

@@ -40,7 +40,6 @@ const handleCreateNewUser = async (req, res) => {
 const handleUpdateNewUser = async (req, res) => {
     try {
         let resp = await userService.handleUpdateNewUser(req.body)
-        console.log(resp)
         return res.status(200).json(resp)
     } catch (error) {
         return res.status(200).json({

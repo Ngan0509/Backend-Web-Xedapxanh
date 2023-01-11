@@ -15,7 +15,6 @@ const handleGetAllComment = async (req, res) => {
 const handleCreateNewComment = async (req, res) => {
     try {
         let resp = await commentService.handleCreateNewComment(req.body)
-        console.log(resp)
         return res.status(200).json(resp)
     } catch (error) {
         return res.status(200).json({
