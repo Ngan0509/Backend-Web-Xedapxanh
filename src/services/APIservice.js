@@ -3,7 +3,7 @@ import pool from "../configs/connectDB";
 const getData = () => {
     return new Promise(async (resolve, reject) => {
         try {
-            const [rows, fields] = await pool.execute('SELECT * FROM admin')
+            const { rows } = await pool.query('SELECT * FROM "Admin"')
             resolve({
                 errCode: 0,
                 errMessage: 'Ok',

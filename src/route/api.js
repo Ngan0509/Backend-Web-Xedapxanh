@@ -54,10 +54,10 @@ const initAPIRoute = (app) => {
     router.put("/api/update-filter", filterController.handleUpdateNewFilter)
     router.delete("/api/delete-filter", filterController.handleDeleteNewFilter)
 
-    router.get("/api/get-all-cart", cartController.handleGetAllCart)
-    router.post("/api/create-new-cart", cartController.handleCreateNewCart)
-    router.put("/api/update-cart", cartController.handleUpdateNewCart)
-    router.delete("/api/delete-cart", cartController.handleDeleteNewCart)
+    // router.get("/api/get-all-cart", cartController.handleGetAllCart)
+    // router.post("/api/create-new-cart", cartController.handleCreateNewCart)
+    // router.put("/api/update-cart", cartController.handleUpdateNewCart)
+    // router.delete("/api/delete-cart", cartController.handleDeleteNewCart)
 
     router.get("/api/get-all-checkout", checkoutController.handleGetAllCheckout)
     router.post("/api/create-new-checkout", checkoutController.handleCreateNewCheckout)

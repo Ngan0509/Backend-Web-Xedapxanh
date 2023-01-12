@@ -19,37 +19,37 @@ const handleGetAllCheckout = (checkoutId, role) => {
             }
             if (checkoutId === "All") {
                 if (role === 'AdminS2') {
-                    const [rows, fields] = await pool.execute('SELECT * FROM checkout WHERE statusId= ?', ['S2'])
+                    const { rows } = await pool.query('SELECT * FROM "Checkout" WHERE "statusId"= $1', ['S2'])
                     checkouts = rows
                 } else if (role === 'ShipperS3') {
-                    const [rows, fields] = await pool.execute('SELECT * FROM checkout WHERE statusId= ?', ['S3'])
+                    const { rows } = await pool.query('SELECT * FROM "Checkout" WHERE "statusId"= $1', ['S3'])
                     checkouts = rows
                 } else if (role === 'ShipperS4') {
-                    const [rows, fields] = await pool.execute('SELECT * FROM checkout WHERE statusId= ?', ['S4'])
+                    const { rows } = await pool.query('SELECT * FROM "Checkout" WHERE "statusId"= $1', ['S4'])
                     checkouts = rows
                 } else if (role === 'ShipperS5') {
-                    const [rows, fields] = await pool.execute('SELECT * FROM checkout WHERE statusId= ?', ['S5'])
+                    const { rows } = await pool.query('SELECT * FROM "Checkout" WHERE "statusId"= $1', ['S5'])
                     checkouts = rows
                 } else if (role === 'AdminS6') {
-                    const [rows, fields] = await pool.execute('SELECT * FROM checkout WHERE statusId= ?', ['S6'])
+                    const { rows } = await pool.query('SELECT * FROM "Checkout" WHERE "statusId"= $1', ['S6'])
                     checkouts = rows
                 } else {
-                    const [rows, fields] = await pool.execute('SELECT * FROM checkout')
+                    const { rows } = await pool.query('SELECT * FROM "Checkout"')
                     checkouts = rows
                 }
             } else if (checkoutId && checkoutId !== 'All' && role === 'Client') {
-                const [rows, fields] = await pool.execute('SELECT * FROM checkout WHERE client_id= ?', [checkoutId])
+                const { rows } = await pool.query('SELECT * FROM "Checkout" WHERE client_id= $1', [checkoutId])
                 checkouts = rows
             }
 
-            const [clients, b] = await pool.execute('SELECT id, fullname, email, phoneNumber, genderId FROM client')
+            const { rows: clients } = await pool.query('SELECT "id", "fullname", "email", "phoneNumber", "genderId" FROM "Client"')
 
-            const [allcode, c] = await pool.execute('SELECT keyMap, valueEn, valueVi FROM allcodeuser')
+            const { rows: allcode } = await pool.query('SELECT "keyMap", "valueEn", "valueVi" FROM "Allcodeuser"')
 
-            const [orderDetails, d] = await pool.execute('SELECT * FROM detail_order')
+            const { rows: orderDetails } = await pool.query('SELECT * FROM "Detail_Order"')
 
-            const [bicycles, f] = await pool.execute('SELECT id, name, image, price_new, price_old FROM bicycle')
-            const [accessories, g] = await pool.execute('SELECT id, name, image, price_new FROM accessories')
+            const { rows: bicycles } = await pool.query('SELECT "id", "name", "image", "price_new", "price_old" FROM "Bicycle"')
+            const { rows: accessories } = await pool.query('SELECT "id", "name", "image", "price_new" FROM "Accessories"')
 
             let result = checkouts.map((checkout) => {
                 let clientData = {}
@@ -166,30 +166,30 @@ const handleCreateNewCheckout = (data) => {
 
             const { noi_nhan, ghi_chu, city_id, district_id, delivery_id, payment_id, client_id, sum_price, date, lang, statusId, listAllCart } = data
 
-            await pool.execute(
-                'INSERT INTO checkout(noi_nhan, ghi_chu, city_id, district_id, delivery_id, payment_id, client_id, sum_price, date, statusId, token) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            await pool.query(
+                'INSERT INTO "Checkout"("noi_nhan", "ghi_chu", "city_id", "district_id", "delivery_id", "payment_id", "client_id", "sum_price", "date", "statusId", "token") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)',
                 [noi_nhan, ghi_chu, city_id, district_id, delivery_id, payment_id, client_id, sum_price, date, statusId, token]
             );
 
-            const [checkouts, a] = await pool.execute('SELECT id FROM checkout WHERE token = ?', [token])
+            const { rows: checkouts } = await pool.query('SELECT "id" FROM "Checkout" WHERE token = $1', [token])
             const checkout_id = checkouts[0].id
 
             if (listAllCart && listAllCart.length > 0) {
                 listAllCart.forEach(async (item) => {
                     const { product_id, type, so_luong, price, sum_price } = item
 
-                    await pool.execute(
-                        'INSERT INTO detail_order(checkout_id, product_id, type, so_luong, price, sum_price) VALUES (?, ?, ?, ?, ?, ?)',
+                    await pool.query(
+                        'INSERT INTO "Detail_Order"("checkout_id", "product_id", "type", "so_luong", "price", "sum_price") VALUES ($1, $2, $3, $4, $5, $6)',
                         [checkout_id, product_id, type, so_luong, price, sum_price]
                     );
                 })
             }
 
-            let [deliverys, c] = await pool.execute('SELECT * FROM allcodeuser WHERE keyMap = ?', [delivery_id])
+            let { rows: deliverys } = await pool.query('SELECT * FROM "Allcodeuser" WHERE "keyMap" = $1', [delivery_id])
 
-            let [payments, d] = await pool.execute('SELECT * FROM allcodeuser WHERE keyMap = ?', [payment_id])
+            let { rows: payments } = await pool.query('SELECT * FROM "Allcodeuser" WHERE "keyMap" = $1', [payment_id])
 
-            let [clients, e] = await pool.execute('SELECT * FROM client WHERE id = ?', [client_id])
+            let { rows: clients } = await pool.query('SELECT * FROM "Client" WHERE id = $1', [client_id])
 
             let orderDetails = listAllCart;
 
@@ -239,7 +239,7 @@ const handleUpdateStatusIdCheckout = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
             const { token, statusId } = data
-            const [rows, fields] = await pool.execute('SELECT * FROM checkout WHERE token = ?', [token])
+            const { rows } = await pool.query('SELECT * FROM "Checkout" WHERE token = $1', [token])
             let checkout = rows[0]
             if (!checkout) {
                 resolve({
@@ -249,31 +249,31 @@ const handleUpdateStatusIdCheckout = (data) => {
             }
 
             if (statusId === 'S1') {
-                await pool.execute('UPDATE checkout SET statusId= ? where token = ?',
+                await pool.query('UPDATE "Checkout" SET "statusId"= $1 where "token" = $2',
                     ['S2', token]
                 );
             } else if (statusId === 'S2') {
-                await pool.execute('UPDATE checkout SET statusId= ? where token = ?',
+                await pool.query('UPDATE "Checkout" SET "statusId"= $1 where "token" = $2',
                     ['S3', token]
                 );
             } else if (statusId === 'S3') {
-                await pool.execute('UPDATE checkout SET statusId= ? where token = ?',
+                await pool.query('UPDATE "Checkout" SET "statusId"= $1 where "token" = $2',
                     ['S4', token]
                 );
             } else if (statusId === 'S4') {
-                await pool.execute('UPDATE checkout SET statusId= ? where token = ?',
+                await pool.query('UPDATE "Checkout" SET "statusId"= $1 where "token" = $2',
                     ['S5', token]
                 );
             } else if (statusId === 'S5') {
-                await pool.execute('UPDATE checkout SET statusId= ? where token = ?',
+                await pool.query('UPDATE "Checkout" SET "statusId"= $1 where "token" = $2',
                     ['S6', token]
                 );
             } else if (statusId === 'Cancel') {
-                await pool.execute('UPDATE checkout SET statusId= ? where token = ?',
+                await pool.query('UPDATE "Checkout" SET "statusId"= $1 where "token" = $2',
                     ['S7', token]
                 );
             } else if (statusId === 'S7') {
-                await pool.execute('UPDATE checkout SET statusId= ? where token = ?',
+                await pool.query('UPDATE "Checkout" SET "statusId"= $1 where "token" = $2',
                     ['S2', token]
                 );
             }

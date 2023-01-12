@@ -11,11 +11,11 @@ const handleGetAllComment = (product_id, type) => {
                 })
             }
 
-            const [favorites, c] = await pool.execute('SELECT * FROM favorite')
+            const { rows: favorites } = await pool.query('SELECT * FROM "Favorite"')
 
-            const [comments, a] = await pool.execute('SELECT * FROM comment WHERE product_id= ? && type= ?', [product_id, type])
+            const { rows: comments } = await pool.query('SELECT * FROM "Comment" WHERE product_id= $1 AND type= $2', [product_id, type])
 
-            const [answers, b] = await pool.execute('SELECT * FROM answer')
+            const { rows: answers } = await pool.query('SELECT * FROM "Answer"')
 
             let result = []
             if (comments.length > 0) {
@@ -60,8 +60,8 @@ const handleCreateNewComment = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
             const { product_id, client_id, type, fullname, date, content, phoneNumber } = data
-            await pool.execute(
-                'INSERT INTO comment(product_id, client_id, type, fullname, date, content, phoneNumber) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            await pool.query(
+                'INSERT INTO "Comment"("product_id", "client_id", "type", "fullname", "date", "content", "phoneNumber") VALUES ($1, $2, $3, $4, $5, $6, $7)',
                 [product_id, client_id, type, fullname, date, content, phoneNumber]
             );
 
@@ -80,7 +80,7 @@ const handleCreateNewComment = (data) => {
 const handleDeleteNewComment = (commentId) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const [rows, fields] = await pool.execute('SELECT * FROM comment WHERE id = ?', [commentId])
+            const { rows } = await pool.query('SELECT * FROM "Comment" WHERE id = $1', [commentId])
             let comment = rows[0]
             if (!comment) {
                 resolve({
@@ -88,7 +88,7 @@ const handleDeleteNewComment = (commentId) => {
                     errMessage: "comment is not found"
                 })
             }
-            await pool.execute('DELETE FROM comment WHERE id = ?', [commentId])
+            await pool.query('DELETE FROM "Comment" WHERE id = $1', [commentId])
 
             resolve({
                 errCode: 0,
@@ -110,7 +110,7 @@ const handleUpdateNewComment = (data) => {
                     errMessage: "Missing parameters"
                 })
             }
-            const [rows, fields] = await pool.execute('SELECT * FROM comment WHERE id = ?', [commentId])
+            const { rows } = await pool.query('SELECT * FROM "Comment" WHERE id = $1', [commentId])
             let comment = rows[0]
             if (!comment) {
                 resolve({
@@ -119,7 +119,7 @@ const handleUpdateNewComment = (data) => {
                 })
             }
             const { content, date } = data
-            await pool.execute('UPDATE comment SET content= ?, date= ? where id = ?',
+            await pool.query('UPDATE "Comment" SET "content"= $1, "date"= $2 where id = $3',
                 [content, date, commentId]
             );
             resolve({

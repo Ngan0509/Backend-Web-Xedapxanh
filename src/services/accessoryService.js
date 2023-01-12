@@ -8,15 +8,15 @@ const handleGetAllAccessory = (accessoryId) => {
         try {
             let accessories = ""
             if (accessoryId === "All") {
-                const [rows, fields] = await pool.execute('SELECT id, category_id, name, image, price_new, accessories_id FROM accessories')
+                const { rows } = await pool.query('SELECT "id", "category_id", "name", "image", "price_new", "accessories_id" FROM "Accessories"')
                 accessories = rows
             }
             if (accessoryId && accessoryId !== "All") {
-                const [rows, fields] = await pool.execute('SELECT id, category_id, name, image, price_new, accessories_id FROM accessories WHERE category_id = ?', [accessoryId])
+                const { rows } = await pool.query('SELECT "id", "category_id", "name", "image", "price_new", "accessories_id" FROM "Accessories" WHERE category_id = $1', [accessoryId])
                 accessories = rows
             }
 
-            const [categories, d] = await pool.execute('SELECT * FROM categogy')
+            const { rows: categories } = await pool.query('SELECT * FROM "Categogy"')
 
 
             accessories = accessories.map(accessory => {
@@ -57,7 +57,7 @@ const handleGetDetailAccessories = (accessoryId) => {
     return new Promise(async (resolve, reject) => {
         try {
             let data = {}
-            const [accessories, a] = await pool.execute('SELECT * FROM accessories WHERE id=?', [accessoryId])
+            const { rows: accessories } = await pool.query('SELECT * FROM "Accessories" WHERE id=$1', [accessoryId])
             let imageBase64 = '';
             if (accessories[0].image) {
                 imageBase64 = Buffer.from(accessories[0].image, 'base64').toString('binary')
@@ -82,8 +82,8 @@ const handleCreateNewAccessory = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
             const { category, productName, previewImg, priceNew, accessories_id } = data
-            await pool.execute(
-                'INSERT INTO accessories(category_id, name, image, price_new, accessories_id) VALUES (?, ?, ?, ?, ?)',
+            await pool.query(
+                'INSERT INTO "Accessories"("category_id", "name", "image", "price_new", "accessories_id") VALUES ($1, $2, $3, $4, $5)',
                 [category, productName, previewImg, priceNew, accessories_id]
             );
 
@@ -102,7 +102,7 @@ const handleCreateNewAccessory = (data) => {
 const handleDeleteNewAccessory = (accessoryId) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const [rows, fields] = await pool.execute('SELECT * FROM accessories WHERE id = ?', [accessoryId])
+            const { rows } = await pool.query('SELECT * FROM "Accessories" WHERE id = $1', [accessoryId])
             let accessory = rows[0]
             if (!accessory) {
                 resolve({
@@ -110,7 +110,7 @@ const handleDeleteNewAccessory = (accessoryId) => {
                     errMessage: "accessory is not found"
                 })
             }
-            await pool.execute('DELETE FROM accessories WHERE id = ?', [accessoryId])
+            await pool.query('DELETE FROM "Accessories" WHERE id = $1', [accessoryId])
 
             resolve({
                 errCode: 0,
@@ -132,7 +132,7 @@ const handleUpdateNewAccessory = (data) => {
                     errMessage: "Missing parameters"
                 })
             }
-            const [rows, fields] = await pool.execute('SELECT * FROM accessories WHERE id = ?', [accessoryId])
+            const { rows } = await pool.query('SELECT * FROM "Accessories" WHERE id = $1', [accessoryId])
             let accessory = rows[0]
             if (!accessory) {
                 resolve({
@@ -141,7 +141,7 @@ const handleUpdateNewAccessory = (data) => {
                 })
             }
             const { category, productName, previewImg, priceNew, accessories_id } = data
-            await pool.execute('UPDATE accessories SET category_id= ?, name= ?, image=?, price_new=?, accessories_id=?  where id = ?',
+            await pool.query('UPDATE "Accessories" SET "category_id"= $1, "name"= $2, "image"=$3, "price_new"=$4, "accessories_id"=$5  where id = $6',
                 [category, productName, previewImg, priceNew, accessories_id, accessoryId]
             );
             resolve({

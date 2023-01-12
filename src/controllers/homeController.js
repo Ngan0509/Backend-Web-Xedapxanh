@@ -4,13 +4,13 @@ const salt = bcrypt.genSaltSync(10);
 
 const getHomePage = async (req, res) => {
 
-    const [rows, fields] = await pool.execute('SELECT * FROM admin');
+    const { rows } = await pool.query('SELECT * FROM "Admin"');
     return res.render('index.ejs', { dataUser: rows })
 }
 
 const getDetailPage = async (req, res) => {
     const userId = req.params.id
-    const [rows, fields] = await pool.execute('SELECT * FROM admin where `id` = ?', [userId])
+    const { rows } = await pool.query('SELECT * FROM "Admin" where id = $1', [userId])
     return res.send(JSON.stringify(rows[0]))
 }
 
@@ -19,7 +19,7 @@ const createNewUser = async (req, res) => {
 
     let hashPassword = await hashUserPassword(password)
 
-    await pool.execute('INSERT INTO admin (name, email, password, roleId, phoneNumber) VALUES (?, ?, ?, ?, ?)', [name, email, hashPassword, 'R1', phoneNumber])
+    await pool.query('INSERT INTO "Admin" ("name", "email", "password", "roleId", "phoneNumber") VALUES ($1, $2, $3, $4, $5)', [name, email, hashPassword, 'R1', phoneNumber])
 
     return res.redirect('/')
 }
@@ -38,21 +38,21 @@ const hashUserPassword = (password) => {
 const deleteUser = async (req, res) => {
     let userId = req.body.userId
 
-    await pool.execute('DELETE FROM admin WHERE id = ?', [userId])
+    await pool.query('DELETE FROM "Admin" WHERE id = $1', [userId])
 
     return res.redirect('/')
 }
 
 const getEditPage = async (req, res) => {
     let userId = req.params.id
-    const [rows, fields] = await pool.execute('SELECT * FROM admin where `id` = ?', [userId])
+    const { rows } = await pool.query('SELECT * FROM "Admin" WHERE id = $1', [userId])
     return res.render('updateUser', { dataUser: rows[0] })
 }
 
 const postUpdateUser = async (req, res) => {
     let { name, email, phoneNumber, id } = req.body;
 
-    await pool.execute('UPDATE admin SET name = ?, email = ?, phoneNumber = ? WHERE id = ?',
+    await pool.query('UPDATE "Admin" SET "name" = $1, "email" = $2, "phoneNumber" = $3 WHERE id = $4',
         [name, email, phoneNumber, id])
 
     return res.redirect('/')

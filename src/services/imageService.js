@@ -12,7 +12,7 @@ const handleGetMultiImage = (productId, type) => {
                 })
             }
 
-            const [rows, fields] = await pool.execute('SELECT * FROM product_image WHERE product_id = ? AND type = ?', [productId, type])
+            const { rows } = await pool.query('SELECT * FROM "Product_Image" WHERE product_id = $1 AND type = $2', [productId, type])
             multiImages = rows
 
             if (multiImages && multiImages.length > 0) {
@@ -52,8 +52,8 @@ const handleCreateMultiImage = (data) => {
             })
             result.forEach(async (item) => {
                 const { type, productId, name, image } = item
-                await pool.execute(
-                    'INSERT INTO product_image(type, product_id, name, image) VALUES (?, ?, ?, ?)',
+                await pool.query(
+                    'INSERT INTO "Product_Image"("type", "product_id", "name", "image") VALUES ($1, $2, $3, $4)',
                     [type, productId, name, image]
                 );
             })
@@ -74,7 +74,7 @@ const handleCreateMultiImage = (data) => {
 const handleDeleteMultiImage = (name) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const [rows, fields] = await pool.execute('SELECT * FROM product_image WHERE name = ?', [name])
+            const { rows } = await pool.query('SELECT * FROM "Product_Image" WHERE name = $1', [name])
             let data = rows[0]
             if (!data) {
                 resolve({
@@ -82,7 +82,7 @@ const handleDeleteMultiImage = (name) => {
                     errMessage: "data is not found"
                 })
             }
-            await pool.execute('DELETE FROM product_image WHERE name = ?', [name])
+            await pool.query('DELETE FROM "Product_Image" WHERE name = $1', [name])
 
             resolve({
                 errCode: 0,

@@ -9,7 +9,7 @@ const handleLogInClient = (email, password) => {
             let userData = {}
             let isExist = await checkUserEmail(email)
             if (isExist) {
-                let [rows, fields] = await pool.execute('SELECT * FROM client WHERE email = ?', [email])
+                let { rows } = await pool.query('SELECT * FROM "Client" WHERE email = $1', [email])
                 let user = rows[0]
                 if (user) {
                     let checkPass = bcrypt.compareSync(password, user.password)
@@ -57,7 +57,7 @@ const handleLogInClient = (email, password) => {
 const checkUserEmail = (userEmail) => {
     return new Promise(async (resolve, reject) => {
         try {
-            let [rows, fields] = await pool.execute('SELECT * FROM client WHERE email = ?', [userEmail])
+            let { rows } = await pool.query('SELECT * FROM "Client" WHERE email = $1', [userEmail])
             let user = rows[0]
             if (user) {
                 resolve(true)
@@ -81,8 +81,8 @@ const handleSignUpClient = (data) => {
                 })
             } else {
                 let hashPasswordFromBcrypt = await hashUserPassword(data.password)
-                await pool.execute(
-                    'INSERT INTO client(fullname, email, password ,phoneNumber, genderId) VALUES (?, ?, ?, ?, ?)',
+                await pool.query(
+                    'INSERT INTO "Client"("fullname", "email", "password" ,"phoneNumber", "genderId") VALUES ($1, $2, $3, $4, $5)',
                     [data.fullname, data.email, hashPasswordFromBcrypt, data.phoneNumber, data.gender]
                 );
 
@@ -113,7 +113,7 @@ const hashUserPassword = (password) => {
 const handleDeleteNewClient = (clientId) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const [rows, fields] = await pool.execute('SELECT * FROM client WHERE id = ?', [clientId])
+            const { rows } = await pool.query('SELECT * FROM "Client" WHERE id = $1', [clientId])
             let client = rows[0]
             if (!client) {
                 resolve({
@@ -121,7 +121,7 @@ const handleDeleteNewClient = (clientId) => {
                     errMessage: "client is not found"
                 })
             }
-            await pool.execute('DELETE FROM client WHERE id = ?', [clientId])
+            await pool.query('DELETE FROM "Client" WHERE id = $1', [clientId])
 
             resolve({
                 errCode: 0,
@@ -143,7 +143,7 @@ const handleUpdateNewClient = (data) => {
                     errMessage: "Missing parameters"
                 })
             }
-            const [rows, fields] = await pool.execute('SELECT * FROM client WHERE id = ?', [clientId])
+            const { rows } = await pool.query('SELECT * FROM "Client" WHERE id = $1', [clientId])
             let client = rows[0]
             if (!client) {
                 resolve({
@@ -151,7 +151,7 @@ const handleUpdateNewClient = (data) => {
                     errMessage: "client is not found"
                 })
             }
-            await pool.execute('UPDATE client SET fullname= ?, image= ?, genderId= ?, birthday= ? where id = ?',
+            await pool.query('UPDATE "Client" SET "fullname"= $1, "image"= $2, "genderId"= $3, "birthday"= $4 where id = $5',
                 [data.fullname, data.image, data.gender, data.birthday, clientId]
             );
             resolve({

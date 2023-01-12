@@ -11,11 +11,11 @@ const handleGetAllFilter = (filterId) => {
                 })
             }
             if (filterId === "All") {
-                const [rows, fields] = await pool.execute('SELECT id, category_id, nameEn, nameVi, type FROM filter')
+                const { rows } = await pool.query('SELECT "id", "category_id", "nameEn", "nameVi", "type" FROM "Filter"')
                 filters = rows
             }
             if (filterId && filterId !== "All") {
-                const [rows, fields] = await pool.execute('SELECT id, category_id, nameEn, nameVi, type FROM filter WHERE category_id = ?', [filterId])
+                const { rows } = await pool.query('SELECT "id", "category_id", "nameEn", "nameVi", "type" FROM "Filter" WHERE category_id = $1', [filterId])
                 filters = rows
             }
             resolve({
@@ -33,8 +33,8 @@ const handleCreateNewFilter = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
             const { category, nameEn, nameVi, type } = data
-            await pool.execute(
-                'INSERT INTO filter(category_id, nameEn, nameVi, type) VALUES (?, ?, ?, ?)',
+            await pool.query(
+                'INSERT INTO "Filter"("category_id", "nameEn", "nameVi", "type") VALUES ($1, $2, $3, $4)',
                 [category, nameEn, nameVi, type]
             );
 
@@ -53,7 +53,7 @@ const handleCreateNewFilter = (data) => {
 const handleDeleteNewFilter = (filterId) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const [rows, fields] = await pool.execute('SELECT * FROM filter WHERE id = ?', [filterId])
+            const { rows } = await pool.query('SELECT * FROM "Filter" WHERE id = $1', [filterId])
             let filter = rows[0]
             if (!filter) {
                 resolve({
@@ -61,7 +61,7 @@ const handleDeleteNewFilter = (filterId) => {
                     errMessage: "filter is not found"
                 })
             }
-            await pool.execute('DELETE FROM filter WHERE id = ?', [filterId])
+            await pool.query('DELETE FROM "Filter" WHERE id = $1', [filterId])
 
             resolve({
                 errCode: 0,
@@ -83,7 +83,7 @@ const handleUpdateNewFilter = (data) => {
                     errMessage: "Missing parameters"
                 })
             }
-            const [rows, fields] = await pool.execute('SELECT * FROM filter WHERE id = ?', [filterId])
+            const { rows } = await pool.query('SELECT * FROM "Filter" WHERE id = $1', [filterId])
             let filter = rows[0]
             if (!filter) {
                 resolve({
@@ -92,7 +92,7 @@ const handleUpdateNewFilter = (data) => {
                 })
             }
             const { category, nameEn, nameVi, type } = data
-            await pool.execute('UPDATE filter SET category_id= ?, nameEn= ?, nameVi= ?, type= ? where id = ?',
+            await pool.query('UPDATE "Filter" SET "category_id"= $1, "nameEn"= $2, "nameVi"= $3, "type"= $4 where id = $5',
                 [category, nameEn, nameVi, type, filterId]
             );
             resolve({

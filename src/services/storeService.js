@@ -12,11 +12,11 @@ const handleGetAllStore = (storeId) => {
                 })
             }
             if (storeId === "All") {
-                const [rows, fields] = await pool.execute('SELECT * FROM storesys')
+                const { rows } = await pool.query('SELECT * FROM "Storesys"')
                 stores = rows
             }
             if (storeId && storeId !== "All") {
-                const [rows, fields] = await pool.execute('SELECT * FROM storesys WHERE id = ?', [storeId])
+                const { rows } = await pool.query('SELECT * FROM "Storesys" WHERE id = $1', [storeId])
                 stores = rows
             }
 
@@ -47,8 +47,8 @@ const handleCreateNewStore = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
             const { name, image, address, phoneNumber } = data
-            await pool.execute(
-                'INSERT INTO storesys(name, image, address, phoneNumber) VALUES (?, ?, ?, ?)',
+            await pool.query(
+                'INSERT INTO "Storesys"("name", "image", "address", "phoneNumber") VALUES ($1, $2, $3, $4)',
                 [name, image, address, phoneNumber]
             );
 
@@ -67,7 +67,7 @@ const handleCreateNewStore = (data) => {
 const handleDeleteNewStore = (storeId) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const [rows, fields] = await pool.execute('SELECT * FROM storesys WHERE id = ?', [storeId])
+            const { rows } = await pool.query('SELECT * FROM "Storesys" WHERE id = $1', [storeId])
             let store = rows[0]
             if (!store) {
                 resolve({
@@ -75,7 +75,7 @@ const handleDeleteNewStore = (storeId) => {
                     errMessage: "store is not found"
                 })
             }
-            await pool.execute('DELETE FROM storesys WHERE id = ?', [storeId])
+            await pool.query('DELETE FROM "Storesys" WHERE id = $1', [storeId])
 
             resolve({
                 errCode: 0,
@@ -97,7 +97,7 @@ const handleUpdateNewStore = (data) => {
                     errMessage: "Missing parameters"
                 })
             }
-            const [rows, fields] = await pool.execute('SELECT * FROM storesys WHERE id = ?', [storeId])
+            const { rows } = await pool.query('SELECT * FROM "Storesys" WHERE id = $1', [storeId])
             let store = rows[0]
             if (!store) {
                 resolve({
@@ -106,7 +106,7 @@ const handleUpdateNewStore = (data) => {
                 })
             }
             const { name, image, address, phoneNumber } = data
-            await pool.execute('UPDATE storesys SET name= ?, image= ?, address= ?, phoneNumber= ? where id = ?',
+            await pool.query('UPDATE "Storesys" SET "name"= $1, "image"= $2, "address"= $3, "phoneNumber"= $4 where id = $5',
                 [name, image, address, phoneNumber, storeId]
             );
             resolve({

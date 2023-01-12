@@ -9,7 +9,7 @@ const handleUserLogin = (email, password) => {
             let userData = {}
             let isExist = await checkUserEmail(email)
             if (isExist) {
-                let [rows, fields] = await pool.execute('SELECT * FROM admin WHERE email = ?', [email])
+                let { rows } = await pool.query('SELECT * FROM "Admin" WHERE email = $1', [email])
                 let user = rows[0]
                 if (user) {
                     let checkPass = bcrypt.compareSync(password, user.password)
@@ -54,7 +54,7 @@ const handleUserLogin = (email, password) => {
 const checkUserEmail = (userEmail) => {
     return new Promise(async (resolve, reject) => {
         try {
-            let [rows, fields] = await pool.execute('SELECT * FROM admin WHERE email = ?', [userEmail])
+            let { rows } = await pool.query('SELECT * FROM "Admin" WHERE email = $1', [userEmail])
             let user = rows[0]
             if (user) {
                 resolve(true)
@@ -80,10 +80,10 @@ const getAllCode = (typeInput) => {
 
             let data = []
             if (typeInput === 'ROLE' || typeInput === 'GENDER' || typeInput === 'PROVINCE' || typeInput === 'DELIVERY' || typeInput === 'PAYMENT') {
-                let [rows, fields] = await pool.execute('SELECT * FROM allcodeuser WHERE type = ?', [typeInput])
+                let { rows } = await pool.query('SELECT * FROM "Allcodeuser" WHERE type = $1', [typeInput])
                 data = rows
             } else {
-                let [rows, fields] = await pool.execute('SELECT * FROM allcode WHERE type = ?', [typeInput])
+                let { rows } = await pool.query('SELECT * FROM "Allcode" WHERE type = $1', [typeInput])
                 data = rows
             }
             resolve({
@@ -101,7 +101,7 @@ const handleGetTypeAllCode = () => {
     return new Promise(async (resolve, reject) => {
         try {
 
-            let [rows, fields] = await pool.execute('SELECT DISTINCT type FROM allcode')
+            let { rows } = await pool.query('SELECT DISTINCT "type" FROM "Allcode"')
             let data = rows
 
             resolve({
@@ -122,13 +122,13 @@ const handleGetCategory = (inputType) => {
         try {
             let data
             if (inputType === 'BICYCLE') {
-                const [rows, fields] = await pool.execute('SELECT * FROM categogy WHERE type = ?', [inputType])
+                const { rows } = await pool.query('SELECT * FROM "Categogy" WHERE type = $1', [inputType])
                 data = rows
             } else if (inputType === 'ACCESSORIES') {
-                const [rows, fields] = await pool.execute('SELECT * FROM categogy WHERE type = ?', [inputType])
+                const { rows } = await pool.query('SELECT * FROM "Categogy" WHERE type = $1', [inputType])
                 data = rows
             } else {
-                const [rows, fields] = await pool.execute('SELECT * FROM categogy')
+                const { rows } = await pool.query('SELECT * FROM "Categogy"')
                 data = rows
             }
             resolve({
@@ -147,11 +147,11 @@ const handleGetAllUser = (userId) => {
         try {
             let users = ""
             if (userId === "All") {
-                const [rows, fields] = await pool.execute('SELECT id, name, email, phoneNumber, roleId, genderId, city_id, district_id FROM admin')
+                const { rows } = await pool.query('SELECT "id", "name", "email", "phoneNumber", "roleId", "genderId", "city_id", "district_id" FROM "Admin"')
                 users = rows
             }
             if (userId && userId !== "All") {
-                const [rows, fields] = await pool.execute('SELECT id, name, email, phoneNumber, roleId, genderId, city_id, district_id FROM admin WHERE id = ?', [userId])
+                const { rows } = await pool.query('SELECT "id", "name", "email", "phoneNumber", "roleId", "genderId", "city_id", "district_id" FROM "Admin" WHERE id = $1', [userId])
                 users = rows
             }
             resolve({
@@ -176,8 +176,8 @@ const handleCreateNewUser = (data) => {
                 })
             } else {
                 let hashPasswordFromBcrypt = await hashUserPassword(data.password)
-                await pool.execute(
-                    'INSERT INTO admin(name, email, password ,phoneNumber, roleId, genderId, city_id, district_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                await pool.query(
+                    'INSERT INTO "Admin"("name", "email", "password" , "phoneNumber", "roleId", "genderId", "city_id", "district_id") VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
                     [data.fullname, data.email, hashPasswordFromBcrypt, data.phoneNumber, data.role, data.gender, data.city_id, data.district_id]
                 );
 
@@ -208,7 +208,7 @@ const hashUserPassword = (password) => {
 const handleDeleteNewUser = (userId) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const [rows, fields] = await pool.execute('SELECT * FROM admin WHERE id = ?', [userId])
+            const { rows } = await pool.query('SELECT * FROM "Admin" WHERE id = $1', [userId])
             let user = rows[0]
             if (!user) {
                 resolve({
@@ -216,7 +216,7 @@ const handleDeleteNewUser = (userId) => {
                     errMessage: "user is not found"
                 })
             }
-            await pool.execute('DELETE FROM admin WHERE id = ?', [userId])
+            await pool.query('DELETE FROM "Admin" WHERE id = $1', [userId])
 
             resolve({
                 errCode: 0,
@@ -238,7 +238,7 @@ const handleUpdateNewUser = (data) => {
                     errMessage: "Missing parameters"
                 })
             }
-            const [rows, fields] = await pool.execute('SELECT * FROM admin WHERE id = ?', [userId])
+            const { rows } = await pool.query('SELECT * FROM "Admin" WHERE id = $1', [userId])
             let user = rows[0]
             if (!user) {
                 resolve({
@@ -246,7 +246,7 @@ const handleUpdateNewUser = (data) => {
                     errMessage: "User is not found"
                 })
             }
-            await pool.execute('UPDATE admin SET name= ?, phoneNumber= ?, genderId=?, roleId=?, city_id=?, district_id=? where id = ?',
+            await pool.query('UPDATE "Admin" SET "name"= $1, "phoneNumber"= $2, "genderId"= $3, "roleId"= $4, "city_id"= $5, "district_id"= $6 where id = $7',
                 [data.fullname, data.phoneNumber, data.gender, data.role, data.city_id, data.district_id, data.id]
             );
             resolve({
