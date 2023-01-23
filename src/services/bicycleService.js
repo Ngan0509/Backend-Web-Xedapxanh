@@ -10,11 +10,11 @@ const handleGetAllBicycle = (bicycleId) => {
             let bicycles = []
             if (bicycleId === "All") {
                 const { rows } = await pool.query('SELECT "id", "category_id", "name", "image", "price_space_id", "brand_id", "use_target_id", "weel_size_id", "frame_material_id", "rider_height_id", "brake_id", "disk_number_id", "utilities_id", "price_new", "price_old", "discout" FROM "Bicycle"')
-                bicycles = rows
+                bicycles = rows.reverse();
             }
             if (bicycleId && bicycleId !== "All") {
                 const { rows } = await pool.query('SELECT "id", "category_id", "name", "image", "price_space_id", "brand_id", "use_target_id", "weel_size_id", "frame_material_id", "rider_height_id", "brake_id", "disk_number_id", "utilities_id", "price_new", "price_old", "discout" FROM "Bicycle" WHERE category_id = $1', [bicycleId])
-                bicycles = rows
+                bicycles = rows.reverse();
             }
             const { rows: allcode } = await pool.query('SELECT "keyMap", "valueEn", "valueVi" FROM "Allcode"')
 
